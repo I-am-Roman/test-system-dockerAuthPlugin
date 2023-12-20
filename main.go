@@ -14,6 +14,7 @@ const (
 	TestAuth      = "[Authentication]"
 	TestCreation  = "[Creation]"
 	TestStability = "[Stability]"
+	TestForbidden = "[Forbidden]"
 )
 
 type Config struct {
@@ -118,7 +119,7 @@ func main() {
 		var wait string
 		var results []string
 
-		if strings.Contains(test.Name, TestAuth) {
+		if strings.HasPrefix(test.Name, TestAuth) {
 			wait = fmt.Sprintf(test.Result, config.GlobalVariables["ErrorAuthMessage"])
 			wait = strings.TrimRight(wait, "\n")
 
@@ -138,15 +139,22 @@ func main() {
 			}
 		}
 
-		if strings.Contains(test.Name, TestCreation) {
+		if strings.HasPrefix(test.Name, TestCreation) {
 			template := strings.TrimRight(config.GlobalVariables["ErrorCreationMessage"], "\n")
 			wait = fmt.Sprintf(test.Result, template)
 			wait = strings.TrimRight(wait, "\n")
 			results = Testing(test, containerid)
 		}
 
-		if strings.Contains(test.Name, TestStability) {
+		if strings.HasPrefix(test.Name, TestStability) {
 			template := strings.TrimRight(config.GlobalVariables["WhatIdontExpectFromStabilitisTests"], "\n")
+			wait = fmt.Sprintf(test.Result, template)
+			wait = strings.TrimRight(wait, "\n")
+			results = Testing(test, containerid)
+		}
+
+		if strings.HasPrefix(test.Name, TestForbidden) {
+			template := strings.TrimRight(config.GlobalVariables["ForbiddenMessage"], "\n")
 			wait = fmt.Sprintf(test.Result, template)
 			wait = strings.TrimRight(wait, "\n")
 			results = Testing(test, containerid)
@@ -155,7 +163,8 @@ func main() {
 		testIsOK := false
 		isItTestInStability := strings.Contains(test.Name, TestStability)
 		for i, _ := range results {
-			if strings.Contains(results[i], wait) {
+			// forbbiden make this if with contains
+			if results[i] == wait {
 				if isItTestInStability {
 					PrintLines()
 					msg := fmt.Sprintf("Test number #%d FAILED! I've got: %s, \n\tbut expect: %s", test.Number, results, wait)

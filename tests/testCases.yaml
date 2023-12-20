@@ -9,7 +9,10 @@ globalVariables:
       docker: Error response from daemon: authorization denied by plugin container-authz-plugin: Access denied by AuthPLugin.Container Body not comply container policy:
   WhatIdontExpectFromStabilitisTests: |
       docker: Error response from daemon:
-      
+  ForbiddenMessage: |
+      Error response from daemon: authorization denied by plugin container-authz-plugin: Access denied by AuthPLugin:
+
+
 testsForDockerContainerAuthPlugin:
   - number: 0
     name: "[Authentication] Test docker stop"
@@ -154,3 +157,26 @@ testsForDockerContainerAuthPlugin:
       sudo docker --config /home/user1/.docker/ rm custom_name_for_container
     result: >
       %s
+
+  - number: 21
+    name: "[Forbidden] docker commit"
+    value: |  
+      sudo docker run --name custom_name_for_container_2 ubuntu
+      sudo docker start custom_name_for_container_2
+      sudo docker commit custom_name_for_container_2
+    result: >
+      %s /commit?author=&comment=&container=custom_name_for_container_2&repo=&tag=
+
+  - number: 22
+    name: "[Forbidden] docker volume ls"
+    value: |  
+      sudo docker volume ls
+    result: >
+      %s /volumes
+
+  - number: 23
+    name: "[Forbidden] docker volume create"
+    value: |  
+      sudo docker volume create
+    result: >
+      %s /volumes/create
