@@ -1,0 +1,156 @@
+globalVariables:
+  ContainerID: 8a795cc7b6c2
+  NameOfContainer: sharp_einstein
+  FullContainerID: 8a795cc7b6c2aec07b8ed27111ba8dd9b1ad885c60b5c76661c87e4577464b43
+
+  ErrorAuthMessage: |
+      Error response from daemon: authorization denied by plugin container-authz-plugin: Access denied by AuthPLugin. That's not your container
+  ErrorCreationMessage: |
+      docker: Error response from daemon: authorization denied by plugin container-authz-plugin: Access denied by AuthPLugin.Container Body not comply container policy:
+  WhatIdontExpectFromStabilitisTests: |
+      docker: Error response from daemon:
+      
+testsForDockerContainerAuthPlugin:
+  - number: 0
+    name: "[Authentication] Test docker stop"
+    value: |  
+      sudo docker start %s
+      sudo docker --config /home/user1/.docker/ stop %s
+    result: '%s'
+
+  - number: 1
+    name: "[Authentication] Test docker inspect"
+    value: |  
+      sudo docker --config /home/user1/.docker/ inspect %s
+    result: '%s'
+
+  - number: 2
+    name: "[Authentication] Test docker rm"
+    value: |  
+      sudo docker --config /home/user1/.docker/ rm %s
+    result: '%s'
+
+  - number: 3
+    name: "[Authentication] Test docker exec"
+    value: |  
+      sudo docker --config /home/user1/.docker/ exec %s /bin/bash
+    result: '%s'
+
+  - number: 4
+    name: "[Authentication] Test docker pause"
+    value: |  
+      sudo docker --config /home/user1/.docker/ pause %s
+    result: '%s'
+
+  - number: 5
+    name: "[Authentication] Test docker unpause"
+    value: |  
+      sudo docker --config /home/user1/.docker/ unpause %s
+    result: '%s'
+
+  - number: 6
+    name: "[Authentication] Test docker logs"
+    value: |  
+      sudo docker --config /home/user1/.docker/ logs %s
+    result: '%s'
+
+  - number: 7
+    name: "[Authentication] Test docker port"
+    value: |  
+      sudo docker --config /home/user1/.docker/ port %s
+    result: '%s'
+
+  - number: 8
+    name: "[Authentication] Test docker update"
+    value: |  
+      sudo docker --config /home/user1/.docker/ update --cpu-shares 512 --memory 256m %s 
+    result: '%s'
+
+  - number: 9
+    name: "[Authentication] Test docker cp"
+    value: |  
+      sudo docker --config /home/user1/.docker/ cp %s:/app/requirements.txt /home/overload
+    result: '%s'
+
+  - number: 10
+    name: "[Creation] --privileged"
+    value: |  
+      sudo docker run --privileged ubuntu
+    result: >
+      %s Privileged.
+
+  - number: 11
+    name: "[Creation] --cap-add"
+    value: |  
+      sudo docker run --cap-add=NET_ADMIN ubuntu
+    result: >
+      %s CapAdd.
+
+  - number: 12
+    name: "[Creation] --security-opt"
+    value: |  
+      sudo docker run --security-opt apparmor=unconfined ubuntu
+    result: >
+      %s SecurityOpt.
+
+  - number: 13
+    name: "[Creation] --security-opt"
+    value: |
+      sudo docker run --security-opt seccomp=unconfined ubuntu
+    result: >
+      %s SecurityOpt.
+
+  - number: 14
+    name: "[Creation] --pid"
+    value: |  
+      sudo docker run --pid=host ubuntu
+    result: >
+      %s PidMode.
+
+  - number: 15
+    name: "[Creation] --ipc"
+    value: |  
+      sudo docker run --ipc=host ubuntu
+    result: >
+      %s IpcMode.
+
+  - number: 16
+    name: "[Creation] --v"
+    value: |  
+      sudo docker run -v /home/overload/someFile.txt:/app ubuntu
+    result: >
+      %s Binds.
+
+  - number: 17
+    name: "[Creation] --cgroup-parent"
+    value: |  
+      sudo docker run --cgroup-parent=host ubuntu
+    result: >
+      %s CgroupParent.
+
+  - number: 18
+    name: "[Creation] --device"
+    value: |  
+      sudo docker run --device=/app/overload ubuntu
+    result: >
+      %s PathOnHost.
+
+  - number: 19
+    name: "[Authentication] stop"
+    value: |  
+      sudo docker stop %s
+      sudo docker --config /home/user1/.docker/ start %s 
+    result: >
+      %s
+  
+
+  - number: 20
+    name: "[Stability] docker run"
+    value: |  
+      sudo docker --config /home/user1/.docker/ run --name custom_name_for_container ubuntu
+      sudo docker --config /home/user1/.docker/ start custom_name_for_container
+      sudo docker --config /home/user1/.docker/ inspect custom_name_for_container
+      sudo docker --config /home/user1/.docker/ stop custom_name_for_container
+      sudo docker --config /home/user1/.docker/ rm custom_name_for_container
+    result: >
+      %s
