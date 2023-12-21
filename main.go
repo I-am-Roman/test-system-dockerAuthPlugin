@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Type of test what define at the Test.Name
 const (
 	TestAuth      = "[Authentication]"
 	TestCreation  = "[Creation]"
@@ -38,7 +39,7 @@ func Performer(command string) string {
 	args := strings.Fields(command)
 	cmd := exec.Command(args[0], args[1:]...)
 
-	// Получение вывода команды и ошибки
+	// Get output
 	output, _ := cmd.CombinedOutput()
 	return string(output)
 }
@@ -47,25 +48,28 @@ func Testing(caseOfTest Test, containerid string) []string {
 	lines := strings.Split(caseOfTest.Value, "\n")
 	var results []string
 	for _, i := range lines {
+		var command string
 		if i == "" {
 			continue
 		}
-		var d string
+		// Is it a string, where i need to put a containerid
 		if strings.Contains(i, "%s") {
-			d = fmt.Sprintf(i, containerid)
+			command = fmt.Sprintf(i, containerid)
 		} else {
-			d = i
+			command = i
 		}
-		result := Performer(d)
+		// do this command
+		result := Performer(command)
 		result = strings.TrimRight(result, "\n")
-		res := strings.Split(result, "\n")
-		if len(res) > 1 {
-			for index, info := range res {
+		linesOfResult := strings.Split(result, "\n")
+		if len(linesOfResult) > 1 {
+			for index, info := range linesOfResult {
+				// if docker daemon give us "See docker --help" See test #19
 				if strings.Contains(info, "--help") {
-					res = append(res[:index], res[index+1:]...)
+					linesOfResult = append(linesOfResult[:index], linesOfResult[index+1:]...)
 				}
 			}
-			results = append(results, res...)
+			results = append(results, linesOfResult...)
 		} else {
 			results = append(results, result)
 		}
@@ -123,6 +127,7 @@ func main() {
 			wait = fmt.Sprintf(test.Result, config.GlobalVariables["ErrorAuthMessage"])
 			wait = strings.TrimRight(wait, "\n")
 
+			// Check a lot of types to call container
 			results = Testing(test, containerid)
 			resultsOfCallnameOfContainer := Testing(test, nameOfContainer)
 			resultsOfCallFullContainerID := Testing(test, fullContainerID)
